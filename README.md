@@ -1,13 +1,12 @@
 # ShelDrone-Min
 
- Open source stm32 Drone project with minimum fly capability.
- This 
+ Open source stm32 Drone project with minimum fly capability. 
+ 
+ This project uses stm32cubeIDE to build. STM32F401CCU6 is used as a default MCU.
+
+ ![implementation](info/flight_control.jpeg)
 
  Add the following paths to Project->Properties->C/C++ General->Paths and Symbols
- 
- 
- ![alt text](info/flight_control.jpeg)
- 
  
  ```
  	Drivers/motor/Inc
