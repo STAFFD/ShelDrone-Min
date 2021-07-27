@@ -25,7 +25,17 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
+#include "usbd_cdc_if.h"
+#include "config.h"
+#include "motor.h"
+#include "receiver.h"
+#include "controlStatus.h"
+#include "pid.h"
+#include "sensors.h"
+#include "debug.h"
+#include "HMC5883L.h"
+#include "battery.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -143,6 +153,11 @@ int main(void)
   MX_SPI1_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
+
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
 
   /* USER CODE END 2 */
 
@@ -631,10 +646,23 @@ void StartMainControlTask(void *argument)
   /* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 5 */
+  motorInit(&htim2,&channels[THROTTLE]);
+  pidsInit();
+#ifdef CALIBRATION
+	for(;;){
+		mapChannel2Motor();
+		osDelay(4);
+	}
+#endif
   /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
+  for(;;){
+	  detectControlStatus();
+	  pidProcess();
+	  setMotors3D(pid_pitch.out,
+				  pid_roll.out,
+				  pid_yaw.out);
+
+	  osDelay(4);
   }
   /* USER CODE END 5 */
 }
@@ -649,10 +677,12 @@ void StartMainControlTask(void *argument)
 void sensorTask(void *argument)
 {
   /* USER CODE BEGIN sensorTask */
+	IMU_Init(&hi2c1);
+	HMC5883L_Init(&hi2c2);
   /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
+  for(;;){
+	  HMC5883L_GetAngle();
+	  osDelay(50);
   }
   /* USER CODE END sensorTask */
 }
@@ -667,10 +697,18 @@ void sensorTask(void *argument)
 void startWatchDogTask(void *argument)
 {
   /* USER CODE BEGIN startWatchDogTask */
+	LEDSignalInit();
+	batteryInit(&hadc1);
+	LEDToggle(ALL_LED, true);
+
+	LEDSetTimes(RED, 3);
+	LEDSetTimes(GREEN, 4);
+
   /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
+  for(;;){
+	  watchBattery();
+	  LEDSignal();
+	  osDelay(LED_UNIT_PERIOD);
   }
   /* USER CODE END startWatchDogTask */
 }
