@@ -1,7 +1,13 @@
 # ShelDrone-Min
- Open source Drone project with minimum fly capability.
+
+ Open source stm32 Drone project with minimum fly capability.
+ This 
 
  Add the following paths to Project->Properties->C/C++ General->Paths and Symbols
+ 
+ 
+ ![alt text](image/flight_control.jpeg)
+ 
  
  ```
  	Drivers/motor/Inc
