@@ -6,7 +6,7 @@
  Add the following paths to Project->Properties->C/C++ General->Paths and Symbols
  
  
- ![alt text](image/flight_control.jpeg)
+ ![alt text](info/flight_control.jpeg)
  
  
  ```
